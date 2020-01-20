@@ -1,0 +1,15 @@
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\StringCalculator2.deps.json
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\StringCalculator2.runtimeconfig.json
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\StringCalculator2.runtimeconfig.dev.json
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\StringCalculator2.dll
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\StringCalculator2.pdb
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.csproj.CoreCompileInputs.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.AssemblyInfoInputs.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.AssemblyInfo.cs
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.dll
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.pdb
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\Newtonsoft.Json.dll
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\Newtonsoft.Json.xml
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.csproj.CopyComplete
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\bin\Debug\netcoreapp2.1\CalculatorPatterns.json
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculator2\obj\Debug\netcoreapp2.1\StringCalculator2.csprojAssemblyReference.cache
