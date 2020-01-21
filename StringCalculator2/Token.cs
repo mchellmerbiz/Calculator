@@ -16,6 +16,9 @@
                 } else if (value == "*" || value == "/")
                 {
                     Precedence = 2;
+                } else if (value == "^")
+                {
+                    Precedence = 3;
                 }
             }
         }

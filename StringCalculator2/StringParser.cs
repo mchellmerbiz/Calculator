@@ -25,7 +25,7 @@ namespace StringCalculator2
         private List<Token> FSM(string input)
         {
             var tokens = new List<Token>();
-            var validOperations = new List<char>() { '+', '-', '/', '*' };
+            var validOperations = new List<char>() { '+', '-', '/', '*', '^' };
             var validBrackets = new List<char>() { '(', ')' };
             var substringStart = 0;
             var substringEnd = 1;

@@ -70,6 +70,7 @@ namespace StringCalculatorUnitTests
         [InlineData("*", "*")]
         [InlineData("-", "-")]
         [InlineData("/", "/")]
+        [InlineData("^", "^")]
         public void TokeniseOperatorIdentifiesOperator(string testString, string value)
         {
             StringParser sp = new StringParser();
@@ -83,6 +84,7 @@ namespace StringCalculatorUnitTests
         [InlineData("*", "*")]
         [InlineData("-", "-")]
         [InlineData("/", "/")]
+        [InlineData("^", "^")]
         public void TokeniseOperatorIdentifiesOperatorTypeAsOperation(string testString, string value)
         {
             StringParser sp = new StringParser();
@@ -122,6 +124,7 @@ namespace StringCalculatorUnitTests
         [InlineData("*_", "*")]
         [InlineData("/'", "/")]
         [InlineData("a-_", "-")]
+        [InlineData("l^ ", "^")]
         public void TokeniseInvalidCharHandledAndValueCorrect(string testString, string value)
         {
             StringParser sp = new StringParser();
@@ -139,6 +142,7 @@ namespace StringCalculatorUnitTests
          [InlineData("*_", "*", "operation")]
          [InlineData("/'", "/", "operation")]
          [InlineData("a-_", "-", "operation")]
+        [InlineData("l^ ", "^", "operation")]
         public void TokeniseInvalidCharHandledAndTypeCorrect(string testString, string value, string tokenType)
         {
             StringParser sp = new StringParser();
@@ -148,14 +152,15 @@ namespace StringCalculatorUnitTests
         }
 
         [Theory]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 0, "(")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 1, "1234")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 3, "+")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 21, ")")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 24, "25.16")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 5, "*")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 7, "/")]
-        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25", 8, "-")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 0, "(")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 1, "1234")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 3, "+")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 21, ")")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 24, "25.16")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 5, "*")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 7, "/")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 8, "-")]
+        [InlineData("(1234)+2*12/-3+(6-12-(-23+6))*25.16+-0.25^2", 28, "^")]
         public void TokeniserCreatesTokenWithCorrectValue(string testString, int tokenId, string value)
         {
             StringParser sp = new StringParser();

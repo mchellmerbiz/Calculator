@@ -14,6 +14,7 @@ namespace StringCalculatorUnitTests
         private readonly Token _minus = new Token() { Type = "operator", Value = "-" };
         private readonly Token _multiply = new Token() { Type = "operator", Value = "*" };
         private readonly Token _divide = new Token() { Type = "operator", Value = "/" };
+        private readonly Token _exponent = new Token() { Type = "operator", Value = "^" };
         private readonly Token _openBracket = new Token() { Type = "bracket", Value = "(" };
         private readonly Token _closeBracket = new Token() { Type = "bracket", Value = ")" };
         private readonly Token _one = new Token() { Type = "number", Value = "1" };
@@ -174,6 +175,17 @@ namespace StringCalculatorUnitTests
         {
             var unparsedTokens = new List<Token> { _openBracket, _one, _plus, _two, _closeBracket, _plus, _openBracket, _three, _multiply, _four, _closeBracket };
             var expectedTokens = new List<Token> { _one, _two, _plus, _three, _four, _multiply, _plus };
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            Assert.Equal(expectedTokens, parsedTokens);
+        }
+
+        [Fact]
+        public void ParseTokensPrecedenceVaries()
+        {
+            var unparsedTokens = new List<Token> { _one, _plus, _two, _exponent, _three,_divide, _four };
+            var expectedTokens = new List<Token> { _one, _two, _three, _exponent, _four, _divide, _plus };
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
