@@ -4,13 +4,13 @@ using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StringCalculator2;
 
 namespace StringCalculator2
 {
     class StringParser
     {
-        private string TokenState { get; set; } = "initial"; // Present state of FSM parser
         private int TokensBuilt { get; set; }
         private string StoredString { get; set; } // Stored string used for parsing
 
@@ -18,171 +18,160 @@ namespace StringCalculator2
         public List<Token> ParseString(string rawString)
         {
             StoredString = rawString;
-            var tokens = FSM(StoredString);
+            var tokens = ParseStringToTokens(StoredString);
             return tokens;
         }
 
-        private List<Token> FSM(string input)
+        private List<Token> ParseStringToTokens(string input)
         {
             var tokens = new List<Token>();
             var validOperations = new List<char>() { '+', '-', '/', '*', '^' };
-            var validBrackets = new List<char>() { '(', ')' };
+            var validBrackets = new List<char>() {'(', ')'};
+            var validFunctions = new List<string>() { "sin", "cos", "tan" };
+            var singleCharStates = new List<string>() { "operation", "bracket"};
             var substringStart = 0;
-            var substringEnd = 1;
+            var tokenState = "initial";
 
-            foreach (var chr in input)
+            //foreach (var chr in input)
+            for (int i = 0; i < input.Length; i++)
             {
-                if (!ValidateChar(chr, validOperations, validBrackets))
+                var substringEnd = i;
+                var currentChar = input[i];
+                var pastTokenState = tokenState;
+
+                //Set current state based on new char
+                if (char.IsDigit(currentChar) || currentChar == '.')
                 {
-                    HandleInvalidEntryRemoveCharFromString($"Invalid character '{chr}' ignored.", substringEnd);
-                    continue;
+                    tokenState = "number";
+                }
+                else if (validOperations.Contains(currentChar))
+                {
+                    tokenState = "operation";
+                }
+                else if (char.IsLetter(currentChar))
+                {
+                    tokenState = "function";
+                }
+                else if (validBrackets.Contains(currentChar))
+                {
+                    tokenState = "bracket";
                 }
 
-                var currentTokenState = TokenState;
-                switch (currentTokenState)
+                //Build token if necessary
+                if ((tokenState != pastTokenState || singleCharStates.Contains(pastTokenState)) && pastTokenState != "initial")
                 {
-                    case "number":
-                        UpdateState(chr, validOperations, validBrackets);
-                        if (TokenState == "number")
-                        {
-                            substringEnd += 1;
-                        }else if (chr == '.')
-                        {
-                            TokenState = "double";
-                            substringEnd += 1;
-                        }
-                        else
-                        {
-                            tokens.Add(BuildToken("number", substringStart, substringEnd));
-                            substringStart = substringEnd;
-                            substringEnd += 1;
-                        }
-                        break;
+                    var newToken = BuildToken(pastTokenState, substringStart, substringEnd, validFunctions,
+                        validOperations, validBrackets);
+                    if (newToken.Value != null)
+                    {
+                        tokens.Add(newToken);
+                    }
+                    substringStart = substringEnd;
+                }
 
-                    case "double":
-                        UpdateState(chr, validOperations, validBrackets);
-                        if (chr == '.')
-                        {
-                            HandleInvalidEntryRemoveCharFromString($"Number already contains a decimal, ignoring character.", substringEnd);
-                        }
-                        else if (TokenState == "double")
-                        {
-                            substringEnd += 1;
-                        }
-                        else
-                        {
-                            tokens.Add(BuildToken("number", substringStart, substringEnd));
-                            substringStart = substringEnd;
-                            substringEnd += 1;
-                        }
-                        break;
-
-                    case "operation":
-                        UpdateState(chr, validOperations, validBrackets);
-                        tokens.Add(BuildToken("operation", substringStart, substringEnd));
-                        substringStart = substringEnd;
-                        substringEnd += 1;
-                        break;
-
-                    case "bracket":
-                        UpdateState(chr, validOperations, validBrackets);
-                        tokens.Add(BuildToken("bracket", substringStart, substringEnd));
-                        substringStart = substringEnd;
-                        substringEnd += 1;
-                        break;
-
-                    default:
-                        if (char.IsDigit(chr))
-                        {
-                            TokenState = "number";
-                        }
-                        else if (chr == '.')
-                        {
-                            TokenState = "double";
-                        }
-                        else if (validOperations.Contains(chr))
-                        {
-                            TokenState = "operation";
-                        }
-                        else if (validBrackets.Contains(chr))
-                        {
-                            TokenState = "bracket";
-                        }
-                        else
-                        {
-                            HandleInvalidEntryRemoveCharFromString($"Invalid character '{chr}' ignored.", substringEnd);
-                        }
-                        break;
+                //Build token at final iteration
+                if (i == input.Length - 1)
+                {
+                    var finalToken = BuildToken(tokenState, substringStart, input.Length, validFunctions,
+                        validOperations, validBrackets);
+                    if (finalToken.Value != null)
+                    {
+                        tokens.Add(finalToken);
+                    }
                 }
             }
 
-            // The final state is a valid token, build it
-            // The double and number states should produce a token of type, number
-            if (TokenState == "double")
-            {
-                TokenState = "number";
-            }
-            tokens.Add(BuildToken(TokenState, substringStart, substringEnd));
             return tokens;
         }
 
-        private bool ValidateChar(char chr, List<char> validList1, List<char> validList2)
+        private Token BuildToken(string priorState, int substringStart, int substringEnd, List<string> validFunctions, List<char> validOperations, List<char> validBrackets)
         {
-            if (!validList1.Contains(chr) && !validList2.Contains(chr) && !char.IsDigit(chr) && chr != '.')
+            var tokenValue = StoredString.Substring(substringStart, substringEnd - substringStart);
+            tokenValue = CleanValueFromSubstring(tokenValue, priorState, validFunctions, validOperations,
+                validBrackets);
+            if (tokenValue != "")
             {
-                return false;
+                var newToken = new Token() { Type = priorState, Value = tokenValue };
+                return newToken;
             }
-
-            return true;
+            return new Token();
         }
 
-        private void HandleInvalidEntryRemoveCharFromString(string error, int valueEnd)
+        private string CleanValueFromSubstring(string tokenValue, string tokenType, List<string> validFunctions, List<char> validOperations, List<char> validBrackets)
         {
-            // Handle case where invalid char is first char in parsed string
-            if (TokenState == "initial")
+            var rawSubstring = tokenValue;
+            var cleanSubstring = "";
+
+            switch (tokenType)
             {
-                valueEnd = 0;
+                case "number":
+                    bool decimalFound = false;
+                    foreach (var chr in rawSubstring)
+                    {
+                        if (chr == '.')
+                        {
+                            if (!decimalFound)
+                            {
+                                decimalFound = true;
+                                cleanSubstring += chr;
+                            }
+                        } else if (char.IsDigit(chr))
+                        {
+                            cleanSubstring += chr;
+                        }
+                    }
+                    break;
+                case "operation":
+                    foreach (var chr in rawSubstring)
+                    {
+                        if (validOperations.Contains(chr))
+                        {
+                            cleanSubstring += chr;
+                        }
+                    }
+                    break;
+                case "bracket":
+                    foreach (var chr in rawSubstring)
+                    {
+                        if (validBrackets.Contains(chr))
+                        {
+                            cleanSubstring += chr;
+                        }
+                    }
+                    break;
+                case "function":
+                    cleanSubstring = ValidateFunction(validFunctions, rawSubstring);
+                    break;
             }
 
-            Console.WriteLine(error);
-            StoredString = StoredString.Remove(valueEnd, 1);
+            if (rawSubstring != cleanSubstring)
+            {
+                Console.WriteLine($"Token type {tokenType} value parsed: {rawSubstring}\n Correction: {cleanSubstring}\n");
+            }
+            return cleanSubstring;
         }
 
-        private void UpdateState(char newChar, List<char> validOperations, List<char> validBrackets)
+        private string ValidateFunction(List<string> validList, string partialFunction)
         {
-            string charState = TokenState;
-            if (char.IsDigit(newChar) && TokenState != "double")
+            var builtFun = "";
+            foreach (var funChar in partialFunction)
             {
-                charState = "number";
-            }
-            else if (newChar == '.' || char.IsDigit(newChar))
-            {
-                charState = "double";
-            }
-            else if (validOperations.Contains(newChar))
-            {
-                charState = "operation";
-            }
-            else if (validBrackets.Contains(newChar))
-            {
-                charState = "bracket";
+                var iBuiltFun = builtFun + funChar;
+                var fun = validList.Where(function => function.Substring(0, builtFun.Length) == builtFun);
+                var match = validList.Where(function => function == builtFun);
+                if (fun.Count() != 0)
+                {
+                    builtFun = iBuiltFun;
+                }
+
+                if (match.Count() == 1)
+                {
+                    return builtFun;
+                }
             }
 
-            TokenState = charState;
-        }
-
-        private Token BuildToken(string priorState, int valueStart, int valueEnd)
-        {
-            TokensBuilt += 1;
-            var tokenSize = valueEnd - valueStart;
-            var tokenValue = StoredString.Substring(valueStart, tokenSize);
-            var newToken = new Token(){TokenId = TokensBuilt,Type = priorState, Value = tokenValue };
-            return newToken;
-        }
-
-        public StringParser()
-        {
-            TokensBuilt = 0;
+            Console.WriteLine($"Could not form a function token from raw string {partialFunction}");
+            return "";
         }
     }
 }

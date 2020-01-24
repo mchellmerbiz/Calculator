@@ -17,12 +17,35 @@ namespace StringCalculatorUnitTests
         private readonly Token _exponent = new Token() { Type = "operator", Value = "^" };
         private readonly Token _openBracket = new Token() { Type = "bracket", Value = "(" };
         private readonly Token _closeBracket = new Token() { Type = "bracket", Value = ")" };
+        private readonly Token _sin = new Token() { Type = "function", Value = "sin" };
         private readonly Token _one = new Token() { Type = "number", Value = "1" };
         private readonly Token _two = new Token() { Type = "number", Value = "2" };
         private readonly Token _three = new Token() { Type = "number", Value = "3" };
         private readonly Token _four = new Token() { Type = "number", Value = "4" };
         private readonly Token _negativeOne = new Token() { Type = "number", Value = "-1" };
         private readonly Token _negativeTwo = new Token() { Type = "number", Value = "-2" };
+
+        [Fact]
+        public void ParseTokensSingleFunction()
+        {
+            var unparsedTokens = new List<Token> { _sin, _openBracket, _one, _closeBracket };
+            var expectedTokens = new List<Token> { _one, _sin };
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+        }
+
+        [Fact]
+        public void ParseTokensNestedFunction()
+        {
+            var unparsedTokens = new List<Token> { _sin, _openBracket, _one, _plus, _sin, _openBracket, _two, _closeBracket, _closeBracket };
+            var expectedTokens = new List<Token> { _one, _two, _sin, _plus, _sin};
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+        }
 
         [Fact]
         public void ParseTokensSingleOperation()

@@ -15,12 +15,18 @@ namespace StringCalculator2
             var validPolish = new List<Token>();
             var operationStack = new List<Token>();
             var bracketOperationStack = new List<Token>();
+            var functionCache = new List<Token>();
+            var openFunctionBracket = false;
 
             foreach (var token in unsortedTokens)
             {
                 if (token.Type == "bracket")
                 {
                     _parsingState = "handle bracket";
+                }
+                else if(token.Type == "function")
+                {
+                    _parsingState = "function";
                 }
 
                 switch (_parsingState)
@@ -29,6 +35,15 @@ namespace StringCalculator2
                         //Open brackets should act like creating a new fresh polish, we should cache any stored operators
                         if (token.Value == "(")
                         {
+                            //We need to add a placeholder token to the funciton cache to track open brackets not associated with functions
+                            if (openFunctionBracket)
+                            {
+                                openFunctionBracket = false;
+                            }
+                            else
+                            {
+                                functionCache.Add(token);
+                            }
                             _openBrackets += 1;
                             if (operationStack.Count > 0)
                             {
@@ -51,13 +66,25 @@ namespace StringCalculator2
                                 operationStack.Add(bracketOperationStack[0]);
                                 bracketOperationStack.RemoveAt(0);
                             }
+
+                            if (functionCache.Count < 1)
+                            {
+                                throw new System.ArgumentException("Input tokens contain unopened brackets");
+                            }
+
+                            var closedFunction = functionCache.Last();
+                            if (closedFunction.Value != "(")
+                            {
+                                validPolish.Add(closedFunction);
+                            }
+                            functionCache.RemoveAt(functionCache.Count-1);
                             _parsingState = "await operator";
                         }
+                        break;
 
-                        if (_openBrackets < 0)
-                        {
-                            throw new System.ArgumentException("Input tokens contain unopened brackets");
-                        }
+                    case "function":
+                        functionCache.Add(token);
+                        openFunctionBracket = true;
                         break;
 
                     case "await number":
@@ -144,7 +171,7 @@ namespace StringCalculator2
             }
 
             //A valid polish notation has at least three elements
-            if (validPolish.Count < 3)
+            if (validPolish.Count < 2)
             {
                 throw new System.ArgumentException("Input tokens must produce a polish of size 3 or more");
             }

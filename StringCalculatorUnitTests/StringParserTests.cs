@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using StringCalculator2;
@@ -8,6 +9,23 @@ namespace StringCalculatorUnitTests
 {
     public class StringParserTests
     {
+        private readonly Token _plus = new Token() { Type = "operator", Value = "+" };
+        private readonly Token _minus = new Token() { Type = "operator", Value = "-" };
+        private readonly Token _multiply = new Token() { Type = "operator", Value = "*" };
+        private readonly Token _divide = new Token() { Type = "operator", Value = "/" };
+        private readonly Token _exponent = new Token() { Type = "operator", Value = "^" };
+        private readonly Token _openBracket = new Token() { Type = "bracket", Value = "(" };
+        private readonly Token _closeBracket = new Token() { Type = "bracket", Value = ")" };
+        private readonly Token _sin = new Token() { Type = "function", Value = "sin" };
+        private readonly Token _cos = new Token() { Type = "function", Value = "cos" };
+        private readonly Token _tan = new Token() { Type = "function", Value = "tan" };
+        private readonly Token _one = new Token() { Type = "number", Value = "1" };
+        private readonly Token _two = new Token() { Type = "number", Value = "2" };
+        private readonly Token _three = new Token() { Type = "number", Value = "3" };
+        private readonly Token _four = new Token() { Type = "number", Value = "4" };
+        private readonly Token _negativeOne = new Token() { Type = "number", Value = "-1" };
+        private readonly Token _negativeTwo = new Token() { Type = "number", Value = "-2" };
+
         [Theory]
         [InlineData("12.34", "12.34")]
         [InlineData(".05", ".05")]
@@ -116,11 +134,40 @@ namespace StringCalculatorUnitTests
         }
 
         [Theory]
+        [InlineData("sin(1)")]
+        [InlineData("cos(1)")]
+        [InlineData("tan(1)")]
+        public void TokeniseFunctionIdentifiesFunctionBoundaries(string testString)
+        {
+            var functionToken = new Token();
+            switch (testString.Substring(0,3))
+            {
+                case "sin":
+                    functionToken = _sin;
+                    break;
+                case "cos":
+                    functionToken = _cos;
+                    break;
+                case "tan":
+                    functionToken = _tan;
+                    break;
+            }
+            var expectedTokens = new List<Token> {functionToken, _openBracket, _one, _closeBracket};
+            StringParser sp = new StringParser();
+            var validTokens = sp.ParseString(testString);
+            for (int i = 0; i < expectedTokens.Count-1; i++)
+            {
+                Assert.True(expectedTokens[i].Value == validTokens[i].Value, $"Parser failed to parse function {testString} value, expected {expectedTokens[i].Value} parsed {validTokens[i].Value}");
+                Assert.True(expectedTokens[i].Type == validTokens[i].Type, $"Parser failed to parse function {testString} token type, expected {expectedTokens[i].Type} parsed {validTokens[i].Type}");
+            }
+        }
+
+        [Theory]
         [InlineData("uiop('", "(")]
-        [InlineData("1a234)v", "1234")]
+        [InlineData("1234)v", "1234")]
         [InlineData("v+v ", "+")]
         [InlineData(" )v'", ")")]
-        [InlineData("25!t..16", "25.16")]
+        [InlineData("25..16n", "25.16")]
         [InlineData("*_", "*")]
         [InlineData("/'", "/")]
         [InlineData("a-_", "-")]
@@ -135,10 +182,10 @@ namespace StringCalculatorUnitTests
 
         [Theory]
          [InlineData("uiop('", "(", "bracket")]
-         [InlineData("1a234)v", "1234", "number")]
+         [InlineData("1234)v", "1234", "number")]
          [InlineData("v+v ", "+", "operation")]
          [InlineData(" )v'", ")", "bracket")]
-         [InlineData("25!t..16", "25.16", "number")]
+         [InlineData("25..16n", "25.16", "number")]
          [InlineData("*_", "*", "operation")]
          [InlineData("/'", "/", "operation")]
          [InlineData("a-_", "-", "operation")]
