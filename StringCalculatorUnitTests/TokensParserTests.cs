@@ -10,11 +10,11 @@ namespace StringCalculatorUnitTests
 {
     public class TokensParserTests
     {
-        private readonly Token _plus = new Token() { Type = "operator", Value = "+" };
-        private readonly Token _minus = new Token() { Type = "operator", Value = "-" };
-        private readonly Token _multiply = new Token() { Type = "operator", Value = "*" };
-        private readonly Token _divide = new Token() { Type = "operator", Value = "/" };
-        private readonly Token _exponent = new Token() { Type = "operator", Value = "^" };
+        private readonly Token _plus = new Token() { Type = "operation", Value = "+" };
+        private readonly Token _minus = new Token() { Type = "operation", Value = "-" };
+        private readonly Token _multiply = new Token() { Type = "operation", Value = "*" };
+        private readonly Token _divide = new Token() { Type = "operation", Value = "/" };
+        private readonly Token _exponent = new Token() { Type = "operation", Value = "^" };
         private readonly Token _openBracket = new Token() { Type = "bracket", Value = "(" };
         private readonly Token _closeBracket = new Token() { Type = "bracket", Value = ")" };
         private readonly Token _sin = new Token() { Type = "function", Value = "sin" };
@@ -37,6 +37,21 @@ namespace StringCalculatorUnitTests
         }
 
         [Fact]
+        public void ParseTokensSingleFunctionMix()
+        {
+            var unparsedTokens = new List<Token> { _two, _plus, _three, _divide, _sin, _openBracket, _one, _closeBracket };
+            var expectedTokens = new List<Token> { _two, _three, _one, _sin, _divide, _plus };
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            //Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
+        }
+
+        [Fact]
         public void ParseTokensNestedFunction()
         {
             var unparsedTokens = new List<Token> { _sin, _openBracket, _one, _plus, _sin, _openBracket, _two, _closeBracket, _closeBracket };
@@ -44,7 +59,10 @@ namespace StringCalculatorUnitTests
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
-            Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
         }
 
         [Fact]
@@ -63,6 +81,21 @@ namespace StringCalculatorUnitTests
         {
             var unparsedTokens = new List<Token> { _minus, _one, _plus,_minus,_two  };
             var expectedTokens = new List<Token> { _negativeOne, _negativeTwo, _plus };
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            //Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
+        }
+
+        [Fact]
+        public void ParseTokensNegativeNumberMixOperation()
+        {
+            var unparsedTokens = new List<Token> { _one, _plus, _three, _minus, _minus, _two };
+            var expectedTokens = new List<Token> { _one, _three, _plus, _negativeTwo, _minus };
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
@@ -115,8 +148,8 @@ namespace StringCalculatorUnitTests
         [Fact]
         public void ParseTokensPrecedenceInOrderWithInnerBracket()
         {
-            var unparsedTokens = new List<Token> { _openBracket, _one, _plus, _two, _closeBracket, _minus, _three };
-            var expectedTokens = new List<Token> { _one, _two, _plus, _three, _minus };
+            var unparsedTokens = new List<Token> { _openBracket, _three, _plus, _two, _closeBracket, _minus, _minus, _one };
+            var expectedTokens = new List<Token> { _three, _two, _plus, _negativeOne, _minus };
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
@@ -179,7 +212,11 @@ namespace StringCalculatorUnitTests
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
-            Assert.Equal(expectedTokens, parsedTokens);
+            //Assert.Equal(expectedTokens, parsedTokens);
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
         }
 
         [Fact]
@@ -190,7 +227,11 @@ namespace StringCalculatorUnitTests
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
-            Assert.Equal(expectedTokens, parsedTokens);
+            //Assert.Equal(expectedTokens, parsedTokens);
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
         }
 
         [Fact]
@@ -201,7 +242,11 @@ namespace StringCalculatorUnitTests
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
-            Assert.Equal(expectedTokens, parsedTokens);
+            //Assert.Equal(expectedTokens, parsedTokens);
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
         }
 
         [Fact]

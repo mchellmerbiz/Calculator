@@ -11,39 +11,30 @@ namespace StringCalculator2
     {
         static void Main(string[] args)
         {
-            ////String retriever builds and stores/returns some string
-            //StringRetriever sr = new StringRetriever();
-            ////String parser takes a string and parses/stores it
-            //StringParser sp = new StringParser();
+            var sp = new StringParser();
+            var tp = new TokensParser();
+            var tc = new TokenCalculator();
 
-            ////Get the string stored in the string retriever
-            //string rawExpression = sr.RetrieveString();
-            ////Parse string will return a list of tokens as elements of the raw string given
-            //var expressionTokens = sp.ParseString(rawExpression);
+            Console.WriteLine("Enter an expression to evaluate: ");
+            var rawString = Console.ReadLine();
 
-            var tokenParser = new TokensParser();
-            var unparsedTokens = new List<Token>();
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = "(" });
-            //unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = "(" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "number", Value = "1" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "operator", Value = "-" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "number", Value = "2" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = ")" });
-            //unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = ")" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "operator", Value = "*" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = "(" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "number", Value = "3" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "operator", Value = "+" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "number", Value = "3" });
-            unparsedTokens.Add(new Token() { TokenId = 0, Type = "bracket", Value = ")" });
-            //unparsedTokens.Add(new Token() { TokenId = 0, Type = "operator", Value = "*" });
-            //unparsedTokens.Add(new Token() { TokenId = 0, Type = "number", Value = "4" });
-            var parsedTokens = tokenParser.ReversePolishParse(unparsedTokens);
-
+            var parsedTokens = sp.ParseString(rawString);
+            Console.WriteLine("String parsed to tokens:");
             foreach (var expressionToken in parsedTokens)
             {
                 Console.WriteLine($"{expressionToken.Type}: {expressionToken.Value}");
             }
+
+            var orderedTokens = tp.ReversePolishParse(parsedTokens);
+            Console.WriteLine("Tokens parsed as reverse polish:");
+            foreach (var expressionToken in orderedTokens)
+            {
+                Console.WriteLine($"{expressionToken.Type}: {expressionToken.Value}");
+            }
+
+            var evaluation = tc.EvaluateReversePolishExpression(orderedTokens);
+
+            Console.WriteLine($"Expression {rawString} evaluated to {evaluation}.");
             Console.ReadKey();
         }
     }
