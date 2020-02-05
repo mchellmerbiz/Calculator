@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 [assembly: InternalsVisibleTo("StringCalculatorUnitTests")]
+[assembly: InternalsVisibleTo("StringCalculatorAutomatedTests")]
 namespace StringCalculator2
 {
     class Program

@@ -37,6 +37,17 @@ namespace StringCalculatorUnitTests
         }
 
         [Fact]
+        public void ParseTokensMixFunction()
+        {
+            var unparsedTokens = new List<Token> { _one, _multiply, _two, _minus, _sin, _openBracket, _three, _closeBracket };
+            var expectedTokens = new List<Token> { _one, _two, _multiply, _three, _sin, _minus };
+
+            TokensParser tp = new TokensParser();
+            var parsedTokens = tp.ReversePolishParse(unparsedTokens);
+            Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+        }
+
+        [Fact]
         public void ParseTokensSingleFunctionMix()
         {
             var unparsedTokens = new List<Token> { _two, _plus, _three, _divide, _sin, _openBracket, _one, _closeBracket };
