@@ -98,6 +98,16 @@ namespace StringCalculator2
 
                     case "function":
                         functionCache.Add(token);
+                        //If there are operations awaiting precedence check and the first operation wins it should be added before the function handling
+                        if (operationStack.Count > 1)
+                        {
+                            bool cachedLatestOperationTakesPrecedence = OperatorPrecedenceCheck(operationStack[0], operationStack[1]);
+                            if (!cachedLatestOperationTakesPrecedence)
+                            {
+                                validPolish.Add(operationStack[0]);
+                                operationStack.RemoveAt(0);
+                            }
+                        }
                         openFunctionBracket = true;
                         break;
 

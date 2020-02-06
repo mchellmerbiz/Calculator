@@ -44,7 +44,10 @@ namespace StringCalculatorUnitTests
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);
-            Assert.True(parsedTokens.SequenceEqual(expectedTokens));
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                Assert.True(expectedTokens[i].Value == parsedTokens[i].Value);
+            }
         }
 
         [Fact]
