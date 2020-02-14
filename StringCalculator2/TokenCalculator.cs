@@ -7,6 +7,8 @@ namespace StringCalculator2
 {
     class TokenCalculator
     {
+        private List<string> _operandTypes = new List<string>() { "number", "variable" };
+        private List<TokenVariableMap> VariableMap { get; set; }
         public string EvaluateReversePolishExpression(List<Token> inputExpression)
         {
             var tokenStack = new List<Token>();
@@ -22,10 +24,16 @@ namespace StringCalculator2
                 switch (tokenState)
                 {
                     case "initial":
-                        if (token.Type != "number")
+                        if (token.Type == "variable")
+                        {
+                            evaluation = GetVariableValue(token.Value);
+                            break;
+                        }
+                        else if (token.Type != "number")
                         {
                             throw new ArgumentException($"Invalid Input: Expected a number, got a {token.Type}, {token.Value}");
                         }
+
                         evaluation = token.Value;
                         break;
                     case "number":
@@ -66,9 +74,24 @@ namespace StringCalculator2
                             tokenStack.Add(holderToken);
                             break;
                         }
+
+                    case "variable":
+                        var replacementToken = new Token() { Type = "number", Value = GetVariableValue(token.Value) };
+                        tokenStack.Add(replacementToken);
+                        break;
                 }
             }
             return evaluation;
+        }
+
+        private string GetVariableValue(string value)
+        {
+            return VariableMap.Find(tokenMap => value == tokenMap.VariableAlias).VariableValue;
+        }
+
+        public void BuildVariableMap(string varAlias, string varValue)
+        {
+            VariableMap.Add(new TokenVariableMap() { VariableAlias = varAlias, VariableValue = varValue });
         }
 
         private string UpdateEvaluation(string valueOne, string valueTwo, Token operation)
@@ -106,6 +129,11 @@ namespace StringCalculator2
             }
 
             return "";
+        }
+
+        public TokenCalculator()
+        {
+            VariableMap = new List<TokenVariableMap>();
         }
     }
 }

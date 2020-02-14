@@ -43,19 +43,32 @@ namespace StringCalculatorIntegrationTests.StepDefinitions
             _evaluation = calc.EvaluateReversePolishExpression(_calculatorReversePolishTokens.ReversePolishTokens);
 
         }
+
+        [When(@"I evaluate the reverse polish notation tokens with variables as follows:")]
+        public void WhenIEvaluateTheReversePolishNotationTokensWithVariablesAsFollows(Table table)
+        {
+            var calc = new TokenCalculator();
+            foreach (var row in table.Rows)
+            {
+                calc.BuildVariableMap(row[0], row[1]);
+            }
+            _evaluation = calc.EvaluateReversePolishExpression(_calculatorReversePolishTokens.ReversePolishTokens);
+
+        }
         
-        [Then(@"the result should be ""(.*)""")]
-        public void ThenTheResultShouldBe(string expectedValue)
+        [Then(@"the result should be ""(.*)"" to ""(.*)"" decimal places")]
+        public void ThenTheResultShouldBe(string expectedValue, string rounding)
         {
             float eval = float.Parse(_evaluation);
-            var shortenedEval = Math.Round(eval, 4).ToString();
+            int roundingA = int.Parse(rounding);
+            var shortenedEval = Math.Round(eval, roundingA).ToString();
             if (expectedValue != shortenedEval)
             {
                 Assert.Fail(
                     $"Calculator evaluation incorrect:\n" +
                     $"Input String: {_calculatorString}\n" +
-                    $"Expected Evaluation (to 4 decimal spaces): {expectedValue}\n" +
-                    $"Actual Evaluation (to 4 decimal spaces): {shortenedEval}"
+                    $"Expected Evaluation: {expectedValue}\n" +
+                    $"Actual Evaluation: {shortenedEval}"
                 );
             }
             else

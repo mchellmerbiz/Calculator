@@ -28,7 +28,7 @@ namespace StringCalculator2
             var validOperations = new List<char>() { '+', '-', '/', '*', '^' };
             var validBrackets = new List<char>() {'(', ')'};
             var validFunctions = new List<string>() { "sin", "cos", "tan" };
-            var singleCharStates = new List<string>() { "operation", "bracket"};
+            var singleCharStates = new List<string>() { "operation", "bracket", "variable"};
             var substringStart = 0;
             var tokenState = "initial";
 
@@ -89,6 +89,10 @@ namespace StringCalculator2
             var tokenValue = StoredString.Substring(substringStart, substringEnd - substringStart);
             tokenValue = CleanValueFromSubstring(tokenValue, priorState, validFunctions, validOperations,
                 validBrackets);
+            if (priorState == "function" && tokenValue.Length == 1)
+            {
+                priorState = "variable";
+            }
             if (tokenValue != "")
             {
                 var newToken = new Token() { Type = priorState, Value = tokenValue };
@@ -153,6 +157,11 @@ namespace StringCalculator2
 
         private string ValidateFunction(List<string> validList, string partialFunction)
         {
+            if (partialFunction.Length == 1)
+            {
+                return partialFunction;
+            }
+
             var builtFun = "";
             foreach (var funChar in partialFunction)
             {

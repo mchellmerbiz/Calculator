@@ -33,6 +33,13 @@ namespace StringCalculator2
                 Console.WriteLine($"{expressionToken.Type}: {expressionToken.Value}");
             }
 
+            var varTokens = orderedTokens.FindAll(token => token.Type == "variable");
+            foreach (var varToken in varTokens)
+            {
+                Console.WriteLine($"Variable {varToken.Value} detected, set a value: ");
+                var varValue = Console.ReadLine();
+                tc.BuildVariableMap(varToken.Value, varValue);
+            }
             var evaluation = tc.EvaluateReversePolishExpression(orderedTokens);
 
             Console.WriteLine($"Expression {rawString} evaluated to {evaluation}.");

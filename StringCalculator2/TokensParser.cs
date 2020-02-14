@@ -7,7 +7,8 @@ namespace StringCalculator2
 {
     class TokensParser
     {
-        private string _parsingState = "await number";
+        private string _parsingState = "await operand";
+        private List<string> _operandTypes = new List<string>() { "number", "variable" };
         private int _openBrackets;
         
         public List<Token> ReversePolishParse(List<Token> unsortedTokens)
@@ -50,7 +51,7 @@ namespace StringCalculator2
                             bracketOperationStack.Add(CloneStack(operationStack));
                             operationStack.Clear();
 
-                            _parsingState = "await number";
+                            _parsingState = "await operand";
                         }
                         //Closing brackets should finish some sub polish somewhere, cached operators should be restored
                         else
@@ -111,7 +112,7 @@ namespace StringCalculator2
                         openFunctionBracket = true;
                         break;
 
-                    case "await number":
+                    case "await operand":
                         if (token.Type == "operation")
                         {
                             if (token.Value == "-")
@@ -137,15 +138,15 @@ namespace StringCalculator2
 
                     //Set this upcoming operator aside to compare later
                     case "await operator":
-                        if (token.Type == "number")
+                        if (_operandTypes.Contains(token.Type))
                         {
-                            Console.WriteLine($"Two number tokens retrieved in succession, {validPolish.Last().Value} taken and {token.Value} discarded.");
+                            Console.WriteLine($"Two operand tokens retrieved in succession, {validPolish.Last().Value} taken and {token.Value} discarded.");
                             break;
                         }
                         if (operationStack.Count == 0)
                         {
                             operationStack.Add(token);
-                            _parsingState = "await number";
+                            _parsingState = "await operand";
                             break;
                         }
                         operationStack.Add(token);

@@ -24,6 +24,7 @@ namespace StringCalculatorUnitTests
         private readonly Token _four = new Token() { Type = "number", Value = "4" };
         private readonly Token _negativeOne = new Token() { Type = "number", Value = "-1" };
         private readonly Token _negativeTwo = new Token() { Type = "number", Value = "-2" };
+        private readonly Token _varX = new Token() { Type = "variable", Value = "x" };
 
         [Fact]
         public void ParseTokensSingleFunction()
@@ -37,10 +38,10 @@ namespace StringCalculatorUnitTests
         }
 
         [Fact]
-        public void ParseTokensMixFunction()
+        public void ParseTokensVariable()
         {
-            var unparsedTokens = new List<Token> { _one, _multiply, _two, _minus, _sin, _openBracket, _three, _closeBracket };
-            var expectedTokens = new List<Token> { _one, _two, _multiply, _three, _sin, _minus };
+            var unparsedTokens = new List<Token> { _one, _plus, _varX };
+            var expectedTokens = new List<Token> { _one, _varX, _plus };
 
             TokensParser tp = new TokensParser();
             var parsedTokens = tp.ReversePolishParse(unparsedTokens);

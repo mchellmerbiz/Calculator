@@ -9,11 +9,11 @@ namespace StringCalculatorUnitTests
 {
     public class StringParserTests
     {
-        private readonly Token _plus = new Token() { Type = "operator", Value = "+" };
-        private readonly Token _minus = new Token() { Type = "operator", Value = "-" };
-        private readonly Token _multiply = new Token() { Type = "operator", Value = "*" };
-        private readonly Token _divide = new Token() { Type = "operator", Value = "/" };
-        private readonly Token _exponent = new Token() { Type = "operator", Value = "^" };
+        private readonly Token _plus = new Token() { Type = "operation", Value = "+" };
+        private readonly Token _minus = new Token() { Type = "operation", Value = "-" };
+        private readonly Token _multiply = new Token() { Type = "operation", Value = "*" };
+        private readonly Token _divide = new Token() { Type = "operation", Value = "/" };
+        private readonly Token _exponent = new Token() { Type = "operation", Value = "^" };
         private readonly Token _openBracket = new Token() { Type = "bracket", Value = "(" };
         private readonly Token _closeBracket = new Token() { Type = "bracket", Value = ")" };
         private readonly Token _sin = new Token() { Type = "function", Value = "sin" };
@@ -25,6 +25,46 @@ namespace StringCalculatorUnitTests
         private readonly Token _four = new Token() { Type = "number", Value = "4" };
         private readonly Token _negativeOne = new Token() { Type = "number", Value = "-1" };
         private readonly Token _negativeTwo = new Token() { Type = "number", Value = "-2" };
+        private readonly Token _varX = new Token() { Type = "variable", Value = "x" };
+
+        [Fact]
+        public void TokeniseVariable()
+        {
+            var inputString = "x";
+            var expectedTokens = new List<Token>() {_varX};
+
+            StringParser sp = new StringParser();
+            var validTokens = sp.ParseString(inputString);
+            Assert.True(validTokens.Count() == 1, "Variable not recognised as token.");
+            for (int i = 0; i < validTokens.Count-1; i++)
+            {
+                var parsedValue = validTokens[i].Value;
+                var parsedType = validTokens[i].Type;
+                var expectedValue = expectedTokens[i].Value;
+                var expectedType = expectedTokens[i].Type;
+                Assert.True(parsedValue == expectedValue && parsedType == expectedType, $"Parser failed to parse input {inputString}\nExpected: {expectedType} {expectedValue}\nParsed: {parsedType} {parsedValue}");
+            }
+            
+        }
+
+        [Fact]
+        public void TokeniseVariableExpression()
+        {
+            var inputString = "1+x";
+            var expectedTokens = new List<Token>() { _one, _plus, _varX };
+
+            StringParser sp = new StringParser();
+            var validTokens = sp.ParseString(inputString);
+            for (int i = 0; i < validTokens.Count - 1; i++)
+            {
+                var parsedValue = validTokens[i].Value;
+                var parsedType = validTokens[i].Type;
+                var expectedValue = expectedTokens[i].Value;
+                var expectedType = expectedTokens[i].Type;
+                Assert.True(parsedValue == expectedValue && parsedType == expectedType, $"Parser failed to parse input {inputString}\nExpected: {expectedType} {expectedValue}\nParsed: {parsedType} {parsedValue}");
+            }
+
+        }
 
         [Theory]
         [InlineData("12.34", "12.34")]
@@ -163,15 +203,15 @@ namespace StringCalculatorUnitTests
         }
 
         [Theory]
-        [InlineData("uiop('", "(")]
-        [InlineData("1234)v", "1234")]
-        [InlineData("v+v ", "+")]
-        [InlineData(" )v'", ")")]
-        [InlineData("25..16n", "25.16")]
+        [InlineData("&('", "(")]
+        [InlineData("1234)", "1234")]
+        [InlineData(",+ ", "+")]
+        [InlineData(" )'", ")")]
+        [InlineData("25..16=", "25.16")]
         [InlineData("*_", "*")]
         [InlineData("/'", "/")]
-        [InlineData("a-_", "-")]
-        [InlineData("l^ ", "^")]
+        [InlineData(",-_", "-")]
+        [InlineData("_^ ", "^")]
         public void TokeniseInvalidCharHandledAndValueCorrect(string testString, string value)
         {
             StringParser sp = new StringParser();
@@ -181,15 +221,15 @@ namespace StringCalculatorUnitTests
         }
 
         [Theory]
-         [InlineData("uiop('", "(", "bracket")]
-         [InlineData("1234)v", "1234", "number")]
-         [InlineData("v+v ", "+", "operation")]
-         [InlineData(" )v'", ")", "bracket")]
-         [InlineData("25..16n", "25.16", "number")]
+         [InlineData("&('", "(", "bracket")]
+         [InlineData("1234)", "1234", "number")]
+         [InlineData(",+ ", "+", "operation")]
+         [InlineData(" )'", ")", "bracket")]
+         [InlineData("25..16=", "25.16", "number")]
          [InlineData("*_", "*", "operation")]
          [InlineData("/'", "/", "operation")]
-         [InlineData("a-_", "-", "operation")]
-        [InlineData("l^ ", "^", "operation")]
+         [InlineData(",-_", "-", "operation")]
+        [InlineData("_^ ", "^", "operation")]
         public void TokeniseInvalidCharHandledAndTypeCorrect(string testString, string value, string tokenType)
         {
             StringParser sp = new StringParser();

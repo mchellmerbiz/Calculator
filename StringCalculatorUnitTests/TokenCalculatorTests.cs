@@ -24,6 +24,8 @@ namespace StringCalculatorUnitTests
         private readonly Token _four = new Token() { Type = "number", Value = "4" };
         private readonly Token _negativeOne = new Token() { Type = "number", Value = "-1" };
         private readonly Token _negativeTwo = new Token() { Type = "number", Value = "-2" };
+        private readonly Token _varX = new Token() { Type = "variable", Value = "x" };
+        private readonly Token _varY = new Token() { Type = "variable", Value = "y" };
 
         [Theory]
         [InlineData("2+1")]
@@ -114,6 +116,35 @@ namespace StringCalculatorUnitTests
             TokenCalculator tc = new TokenCalculator();
             var input = new List<Token>() { _one, _two,_four,_multiply, _sin, _plus };
             var expectedOutput = "1.9894";
+
+            string actualOutput = tc.EvaluateReversePolishExpression(input);
+            string roundedOutput = Math.Round(float.Parse(actualOutput), 4).ToString();
+            Assert.True(expectedOutput == roundedOutput, $"Expected Output rounded to  fourth decimal: {expectedOutput}\nActual Output: {actualOutput} rounded to {roundedOutput}");
+        }
+
+        [Theory]
+        [InlineData("1+x")]
+        public void CalculateVariableExpression(string inputString)
+        {
+            TokenCalculator tc = new TokenCalculator();
+            var input = new List<Token>() { _one, _varX, _plus };
+            tc.BuildVariableMap("x", "10");
+            var expectedOutput = "11";
+
+            string actualOutput = tc.EvaluateReversePolishExpression(input);
+            string roundedOutput = Math.Round(float.Parse(actualOutput), 4).ToString();
+            Assert.True(expectedOutput == roundedOutput, $"Expected Output rounded to  fourth decimal: {expectedOutput}\nActual Output: {actualOutput} rounded to {roundedOutput}");
+        }
+
+        [Theory]
+        [InlineData("1+x*y")]
+        public void CalculateVariableMultipleExpression(string inputString)
+        {
+            TokenCalculator tc = new TokenCalculator();
+            var input = new List<Token>() { _one, _varX, _varY, _multiply, _plus };
+            tc.BuildVariableMap("x", "2");
+            tc.BuildVariableMap("y", "10");
+            var expectedOutput = "21";
 
             string actualOutput = tc.EvaluateReversePolishExpression(input);
             string roundedOutput = Math.Round(float.Parse(actualOutput), 4).ToString();
