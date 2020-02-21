@@ -24,6 +24,7 @@ namespace StringCalculator2
 
         private List<Token> ParseStringToTokens(string input)
         {
+            TokensBuilt = 0;
             var tokens = new List<Token>();
             var validOperations = new List<char>() { '+', '-', '/', '*', '^' };
             var validBrackets = new List<char>() {'(', ')'};
@@ -95,7 +96,8 @@ namespace StringCalculator2
             }
             if (tokenValue != "")
             {
-                var newToken = new Token() { Type = priorState, Value = tokenValue };
+                var newToken = new Token() { Type = priorState, Value = tokenValue, TokenId = TokensBuilt };
+                TokensBuilt += 1;
                 return newToken;
             }
             return new Token();

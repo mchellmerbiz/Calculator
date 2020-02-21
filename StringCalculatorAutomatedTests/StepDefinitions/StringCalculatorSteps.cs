@@ -3,6 +3,7 @@ using NUnit.Framework;
 using StringCalculatorIntegrationTests.POCOs;
 using StringCalculator2;
 using TechTalk.SpecFlow;
+using System.Collections.Generic;
 
 namespace StringCalculatorIntegrationTests.StepDefinitions
 {
@@ -35,7 +36,15 @@ namespace StringCalculatorIntegrationTests.StepDefinitions
             var rpTokens = tp.ReversePolishParse(_calculatorStringTokens.StringTokens);
             this._calculatorReversePolishTokens = new CalculatorReversePolishTokens(rpTokens);
         }
-        
+
+        [When(@"I optimise the reverse polish notation tokens")]
+        public void WhenIOptimiseTheReversePolishNotationTokens()
+        {
+            var to = new TokensOptimiser();
+            _calculatorReversePolishTokens.ReversePolishTokens = to.OptimiseTokens(_calculatorReversePolishTokens.ReversePolishTokens);
+        }
+
+
         [When(@"I evaluate the reverse polish notation tokens")]
         public void WhenIEvaluateTheReversePolishNotationTokens()
         {

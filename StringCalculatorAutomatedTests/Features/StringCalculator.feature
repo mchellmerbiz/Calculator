@@ -29,7 +29,22 @@ Scenario Outline: Reverse Polish Calculator With Variables
 		| z        | 3        |
 	Then the result should be "<expectedEvaluation>" to "4" decimal places
 Examples:
+| inputString           | expectedEvaluation |
+| x+y                   | 3                  |
+| x+y*z                 | 7                  |
+| x+y*z+4               | 11                 |
+| sin(x)+cos(y*z)*4     | 4.6822             |
+| (sin(x)+cos(y*z)*4)/1 | 4.6822             |
+| (x+1)*(x+1)           | 4                  |
+
+Scenario Outline: Reverse Polish Calculator with Optimisation
+	Given A string expression "<inputString>"
+	When I parse the string into calculator tokens
+	And I parse the calculator tokens into reverse polish notation
+	And I optimise the reverse polish notation tokens
+	And I evaluate the reverse polish notation tokens
+	Then the result should be "<expectedEvaluation>" to "4" decimal places
+Examples:
 | inputString | expectedEvaluation |
-| x+y         | 3                  |
-| x+y*z       | 7                  |
+| 1*1*1*1     | 1                  |
 

@@ -91,7 +91,11 @@ namespace StringCalculator2
 
         public void BuildVariableMap(string varAlias, string varValue)
         {
-            VariableMap.Add(new TokenVariableMap() { VariableAlias = varAlias, VariableValue = varValue });
+            if (VariableMap.FindAll(varMap => varMap.VariableAlias == varAlias).Count == 0)
+            {
+                var newVarMap = new TokenVariableMap() { VariableAlias = varAlias, VariableValue = varValue };
+                VariableMap.Add(newVarMap);
+            }
         }
 
         private string UpdateEvaluation(string valueOne, string valueTwo, Token operation)

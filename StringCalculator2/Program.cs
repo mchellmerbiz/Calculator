@@ -34,11 +34,16 @@ namespace StringCalculator2
             }
 
             var varTokens = orderedTokens.FindAll(token => token.Type == "variable");
+            var mappedVars = new List<string>();
             foreach (var varToken in varTokens)
             {
-                Console.WriteLine($"Variable {varToken.Value} detected, set a value: ");
-                var varValue = Console.ReadLine();
-                tc.BuildVariableMap(varToken.Value, varValue);
+                if (!mappedVars.Contains(varToken.Value))
+                {
+                    mappedVars.Add(varToken.Value);
+                    Console.WriteLine($"Variable {varToken.Value} detected, set a value: ");
+                    var varValue = Console.ReadLine();
+                    tc.BuildVariableMap(varToken.Value, varValue);
+                }
             }
             var evaluation = tc.EvaluateReversePolishExpression(orderedTokens);
 

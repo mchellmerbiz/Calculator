@@ -131,6 +131,10 @@ this.ScenarioInitialize(scenarioInfo);
         [NUnit.Framework.DescriptionAttribute("Reverse Polish Calculator With Variables")]
         [NUnit.Framework.TestCaseAttribute("x+y", "3", null)]
         [NUnit.Framework.TestCaseAttribute("x+y*z", "7", null)]
+        [NUnit.Framework.TestCaseAttribute("x+y*z+4", "11", null)]
+        [NUnit.Framework.TestCaseAttribute("sin(x)+cos(y*z)*4", "4.6822", null)]
+        [NUnit.Framework.TestCaseAttribute("(sin(x)+cos(y*z)*4)/1", "4.6822", null)]
+        [NUnit.Framework.TestCaseAttribute("(x+1)*(x+1)", "4", null)]
         public virtual void ReversePolishCalculatorWithVariables(string inputString, string expectedEvaluation, string[] exampleTags)
         {
             string[] tagsOfScenario = exampleTags;
@@ -180,6 +184,55 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I evaluate the reverse polish notation tokens with variables as follows:", ((string)(null)), table1, "And ");
 #line hidden
 #line 30
+ testRunner.Then(string.Format("the result should be \"{0}\" to \"4\" decimal places", expectedEvaluation), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [NUnit.Framework.TestAttribute()]
+        [NUnit.Framework.DescriptionAttribute("Reverse Polish Calculator with Optimisation")]
+        [NUnit.Framework.TestCaseAttribute("1*1*1*1", "1", null)]
+        public virtual void ReversePolishCalculatorWithOptimisation(string inputString, string expectedEvaluation, string[] exampleTags)
+        {
+            string[] tagsOfScenario = exampleTags;
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Reverse Polish Calculator with Optimisation", null, exampleTags);
+#line 40
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 41
+ testRunner.Given(string.Format("A string expression \"{0}\"", inputString), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 42
+ testRunner.When("I parse the string into calculator tokens", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 43
+ testRunner.And("I parse the calculator tokens into reverse polish notation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 44
+ testRunner.And("I optimise the reverse polish notation tokens", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 45
+ testRunner.And("I evaluate the reverse polish notation tokens", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 46
  testRunner.Then(string.Format("the result should be \"{0}\" to \"4\" decimal places", expectedEvaluation), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

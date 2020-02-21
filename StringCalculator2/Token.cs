@@ -1,6 +1,8 @@
-﻿namespace StringCalculator2
+﻿using System.Collections.Generic;
+
+namespace StringCalculator2
 {
-    class Token
+    public class Token
     {
         private string _value;
         public int TokenId { get; set; }
@@ -24,5 +26,6 @@
         }
         public string Type { get; set; }
         public int Precedence { get; set; }
+        public List<Token> ChildTokens { get; set; }
     }
 }
