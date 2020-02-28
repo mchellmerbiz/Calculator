@@ -13,16 +13,53 @@ namespace StringCalculator2
             var tokenTree = LinkTokensAsTree(input);
 
             var parentTokenIndex = Enumerable.Range(0, tokenTree.Count)
-             .Where(i => tokenTree[i].ChildTokens != null)
+             .Where(i => tokenTree[i].ChildTokens != null && tokenTree[i].Type != "function")
              .ToList();
 
             foreach (var parentIndex in parentTokenIndex)
             {
                 var parent = tokenTree[parentIndex];
+                if (BranchResolvesToZero(parent))
+                {
+
+                    parent.Value = "0";
+                    parent.Type = "number";
+
+                    //Clear out child branches of a zeroing operation
+                    var subparents = new List<Token>();
+                    foreach (var index in parentTokenIndex)
+                    {
+                        if (index == parentIndex)
+                        {
+                            break;
+                        }
+                        subparents.Add(tokenTree[index]);
+                    }
+                    foreach (var subparent in subparents)
+                    {
+                        tokenTree.RemoveAll(token => subparent.ChildTokens.Contains(token));
+                    }
+                    tokenTree.RemoveAll(token => parent.ChildTokens.Contains(token));
+
+                    return OptimiseTokens(tokenTree);
+                }
+
                 if (BranchResolvesToExponent(parent))
                 {
                     parent.Value = "^";
                     parent.ChildTokens[0].Value = "2";
+                    parent.ChildTokens[0].Type = "number";
+
+                    return OptimiseTokens(tokenTree);
+                }
+
+                if (BranchResolvesToOne(parent))
+                {
+
+                    parent.Value = "1";
+                    parent.Type = "number";
+                    tokenTree.RemoveAll(token => parent.ChildTokens.Contains(token));
+
                     return OptimiseTokens(tokenTree);
                 }
 
@@ -46,11 +83,16 @@ namespace StringCalculator2
                         
                     }
 
-                    oldExponentDegree.Value = (float.Parse(oldExponentDegree.Value) + 1).ToString();
+                    var degreeAdjustment = 1;
+                    if (parent.Value == "/")
+                    {
+                        degreeAdjustment = -1;
+                    }
+                    oldExponentDegree.Value = (float.Parse(oldExponentDegree.Value) + degreeAdjustment).ToString();
                     
 
                     //Prune dead branch children
-                    tokenTree.RemoveAll(token => token == parent || token == parent.ChildTokens.Find(t => t.Type == "number"));
+                    tokenTree.RemoveAll(token => token == parent || token == parent.ChildTokens.Find(t => t.Type != "operation"));
 
                     return OptimiseTokens(tokenTree);
                 }
@@ -59,11 +101,46 @@ namespace StringCalculator2
             return tokenTree;
         }
 
-        private bool BranchExtendsExponent(Token parent)
+        private bool BranchResolvesToZero(Token parent)
         {
+            if (parent.Type == "function")
+            {
+                return false;
+            }
+
             var leftChild = parent.ChildTokens[0];
             var rightChild = parent.ChildTokens[1];
             if (parent.Value == "*")
+            {
+                if (leftChild.Value == "0" || rightChild.Value == "0")
+                {
+                    return true;
+                }
+            }
+            if (parent.Value == "/")
+            {
+                if (leftChild.Value == "0")
+                {
+                    throw new NotSupportedException("Attempt to divide by zero");
+                }
+                if (rightChild.Value == "0")
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool BranchExtendsExponent(Token parent)
+        {
+            if (parent.Type == "function")
+            {
+                return false;
+            }
+            var leftChild = parent.ChildTokens[0];
+            var rightChild = parent.ChildTokens[1];
+            if (parent.Value == "*" || parent.Value == "/")
             {
                 if (leftChild.Value == "^")
                 {
@@ -87,11 +164,57 @@ namespace StringCalculator2
 
         private bool BranchResolvesToExponent(Token parent)
         {
+            if (parent.Type == "function")
+            {
+                return false;
+            }
             var leftChild = parent.ChildTokens[0];
             var rightChild = parent.ChildTokens[1];
-            if (parent.Value == "*" || parent.Value == "/")
+            if (parent.Value == "*")
             {
+                if (leftChild.Type == "operation" || rightChild.Type == "operation")
+                {
+                    return false;
+                }
+                if (leftChild.Type == "function" || rightChild.Type == "function")
+                {
+                    return false;
+                }
                 if (leftChild.Value == rightChild.Value)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool BranchResolvesToOne(Token parent)
+        {
+            if (parent.Type == "function")
+            {
+                return false;
+            }
+            var leftChild = parent.ChildTokens[0];
+            var rightChild = parent.ChildTokens[1];
+            if (parent.Value == "/")
+            {
+                if (leftChild.Type == "function" || rightChild.Type == "function")
+                {
+                    return false;
+                }
+                if (leftChild.Value == rightChild.Value)
+                {
+                    return true;
+                }
+            }
+            if (parent.Value == "^")
+            {
+                if (leftChild.Type == "function" || rightChild.Type == "function")
+                {
+                    return false;
+                }
+                if (leftChild.Value == "0")
                 {
                     return true;
                 }
@@ -108,11 +231,15 @@ namespace StringCalculator2
             {
                 switch (token.Type)
                 {
-                    case "number":
+                    default:
                         tokenStack.Push(token);
                         break;
                     case "operation":
                         token.ChildTokens = new List<Token> { tokenStack.Pop(), tokenStack.Pop() };
+                        tokenStack.Push(token);
+                        break;
+                    case "function":
+                        token.ChildTokens = new List<Token> { tokenStack.Pop() };
                         tokenStack.Push(token);
                         break;
                 }

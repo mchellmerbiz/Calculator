@@ -19,6 +19,7 @@ namespace StringCalculatorUnitTests
         private readonly Token _cos = new Token() { Type = "function", Value = "cos" };
         private readonly Token _tan = new Token() { Type = "function", Value = "tan" };
         private readonly Token _one = new Token() { Type = "number", Value = "1" };
+        private readonly Token _zero = new Token() { Type = "number", Value = "0" };
         private readonly Token _two = new Token() { Type = "number", Value = "2" };
         private readonly Token _three = new Token() { Type = "number", Value = "3" };
         private readonly Token _four = new Token() { Type = "number", Value = "4" };
@@ -28,14 +29,15 @@ namespace StringCalculatorUnitTests
         private readonly Token _varY = new Token() { Type = "variable", Value = "y" };
 
         [Fact]
-        public void OptimiseTokensToExponent()
+        public void OptimiseTokensToIncreaseExponent()
         {
             TokensOptimiser to = new TokensOptimiser();
 
-            var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _one, _one, _multiply, _one, _multiply, _one, _multiply };
             var expectedOutput = new List<Token>() { _one, _four, _exponent };
 
-            var actualOutput = to.OptimiseTokens(input);
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
             var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
             for (int i = 0; i < expectedOutput.Count; i++)
             {
@@ -43,6 +45,117 @@ namespace StringCalculatorUnitTests
                 Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
             }
             
+        }
+
+        [Fact]
+        public void OptimiseTokensToDecreaseExponent()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _one, _one, _multiply, _one, _multiply, _one, _divide };
+            var expectedOutput = new List<Token>() { _one, _two, _exponent };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
+
+        }
+
+        [Fact]
+        public void OptimiseTokensToExponentUsingVars()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _varX, _varX, _multiply, _varX, _multiply, _varX, _multiply };
+            var expectedOutput = new List<Token>() { _varX, _four, _exponent };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
+
+        }
+
+
+        [Fact]
+        public void OptimiseTokensToExponentUsingFunctions()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _varX, _sin, _varX, _varX, _multiply, _varX, _multiply, _varX, _multiply, _plus };
+            var expectedOutput = new List<Token>() { _varX, _sin, _varX, _four, _exponent, _plus };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
+
+        }
+
+        [Fact]
+        public void OptimiseTokensResolveToOne()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _varX, _varX, _divide, _varX, _varX, _multiply, _plus };
+            var expectedOutput = new List<Token>() { _one, _varX, _two, _exponent, _plus };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
+        }
+
+        [Fact]
+        public void OptimiseTokensResolveToOneExponent()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            var input = new List<Token>() { _varX, _zero, _exponent, _varX, _varX, _multiply, _plus };
+            var expectedOutput = new List<Token>() { _one, _varX, _two, _exponent, _plus };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
+        }
+
+        [Fact]
+        public void OptimiseTokensResolveToZero()
+        {
+            TokensOptimiser to = new TokensOptimiser();
+
+            //var input = new List<Token>() { _one, CopyToken(_one), _multiply, CopyToken(_one), CopyToken(_multiply), CopyToken(_one), CopyToken(_multiply) };
+            var input = new List<Token>() { _one, _sin, _one, _varX, _divide, _zero, _multiply, _plus };
+            var expectedOutput = new List<Token>() { _one, _sin, _zero, _plus };
+
+            var actualOutput = to.OptimiseTokens(CopyTokens(input));
+            var e = $"Expected Output:\n{TokensToString(expectedOutput)}\nActual Output:\n{TokensToString(actualOutput)}";
+            for (int i = 0; i < expectedOutput.Count; i++)
+            {
+                Assert.True(expectedOutput[i].Value == actualOutput[i].Value, e);
+                Assert.True(expectedOutput[i].Type == actualOutput[i].Type, e);
+            }
         }
 
         private string TokensToString(List<Token> tokens)
@@ -58,6 +171,16 @@ namespace StringCalculatorUnitTests
         private Token CopyToken(Token inToken)
         {
             return new Token() { Type = inToken.Type, Value = inToken.Value };
+        }
+
+        private List<Token> CopyTokens(List<Token> inTokens)
+        {
+            var outTokens = new List<Token>();
+            foreach (var token in inTokens)
+            {
+                outTokens.Add(new Token() { Type = token.Type, Value = token.Value });
+            }
+            return outTokens;
         }
     }
 }
