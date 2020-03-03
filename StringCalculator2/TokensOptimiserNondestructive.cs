@@ -5,21 +5,27 @@ using System.Text;
 
 namespace StringCalculator2
 {
-    class TokensOptimiser
+    public class TokensOptimiserNondestructive
     {
-        List<int> OptimisedTokensMap { get; set; }
-        internal List<Token> OptimiseTokens(List<Token> input)
-        {
-            //TODO: probably shouldn't turn into a tree after every optimisation
-            var tokenTree = LinkTokensAsTree(input);
+        public List<Token> OptimisedTokens { get; set; }
+        public List<Token> InputTokenTree { get; set; }
+        public List<int> ParentTokenIndex { get; set; }
 
-            var parentTokenIndex = Enumerable.Range(0, tokenTree.Count)
-             .Where(i => tokenTree[i].ChildTokens != null && tokenTree[i].Type != "function")
+        public void InjectTokens(List<Token> inputTokens)
+        {
+            InputTokenTree = LinkTokensAsTree(inputTokens);
+            OptimisedTokens = InputTokenTree;
+        }
+
+        internal void OptimiseTokensNondestructive()
+        {
+            var ParentTokenIndex = Enumerable.Range(0, OptimisedTokens.Count)
+             .Where(i => OptimisedTokens[i].ChildTokens != null && OptimisedTokens[i].Type != "function")
              .ToList();
 
-            foreach (var parentIndex in parentTokenIndex)
+            foreach (var parentIndex in ParentTokenIndex)
             {
-                var parent = tokenTree[parentIndex];
+                var parent = OptimisedTokens[parentIndex];
                 if (BranchResolvesToZero(parent))
                 {
 
@@ -28,43 +34,44 @@ namespace StringCalculator2
 
                     //Clear out child branches of a zeroing operation
                     var subparents = new List<Token>();
-                    foreach (var index in parentTokenIndex)
+                    foreach (var index in ParentTokenIndex)
                     {
                         if (index == parentIndex)
                         {
                             break;
                         }
-                        subparents.Add(tokenTree[index]);
+                        subparents.Add(OptimisedTokens[index]);
                     }
                     foreach (var subparent in subparents)
                     {
-                        tokenTree.RemoveAll(token => subparent.ChildTokens.Contains(token));
+                        OptimisedTokens.RemoveAll(token => subparent.ChildTokens.Contains(token));
                     }
-                    tokenTree.RemoveAll(token => parent.ChildTokens.Contains(token));
-
-                    return OptimiseTokens(tokenTree);
+                    OptimisedTokens.RemoveAll(token => parent.ChildTokens.Contains(token));
+                    break;
                 }
 
-                if (BranchResolvesToExponent(parent))
+                else if (BranchResolvesToExponent(parent))
                 {
                     parent.Value = "^";
                     parent.ChildTokens[0].Value = "2";
                     parent.ChildTokens[0].Type = "number";
 
-                    return OptimiseTokens(tokenTree);
+                    OptimiseTokensNondestructive();
+                    break;
                 }
 
-                if (BranchResolvesToOne(parent))
+                else if (BranchResolvesToOne(parent))
                 {
 
                     parent.Value = "1";
                     parent.Type = "number";
-                    tokenTree.RemoveAll(token => parent.ChildTokens.Contains(token));
+                    OptimisedTokens.RemoveAll(token => parent.ChildTokens.Contains(token));
 
-                    return OptimiseTokens(tokenTree);
+                    OptimiseTokensNondestructive();
+                    break;
                 }
 
-                if (BranchExtendsExponent(parent))
+                else if (BranchExtendsExponent(parent))
                 {
                     //Define new tokens for Extended Exponent
                     var oldExponent = parent.ChildTokens.Find(token => token.Value == "^");
@@ -74,14 +81,14 @@ namespace StringCalculator2
                     //Update branch to extended exponent
                     try
                     {
-                        var parentParentIndex = parentTokenIndex.Find(ind => ind > parentIndex);
-                        var parentParent = tokenTree[parentParentIndex];
+                        var parentParentIndex = ParentTokenIndex.Find(ind => ind > parentIndex);
+                        var parentParent = OptimisedTokens[parentParentIndex];
                         parentParent.ChildTokens[1] = oldExponent;
                     }
                     catch (Exception)
                     {
 
-                        
+
                     }
 
                     var degreeAdjustment = 1;
@@ -90,16 +97,15 @@ namespace StringCalculator2
                         degreeAdjustment = -1;
                     }
                     oldExponentDegree.Value = (float.Parse(oldExponentDegree.Value) + degreeAdjustment).ToString();
-                    
+
 
                     //Prune dead branch children
-                    tokenTree.RemoveAll(token => token == parent || token == parent.ChildTokens.Find(t => t.Type != "operation"));
+                    OptimisedTokens.RemoveAll(token => token == parent || token == parent.ChildTokens.Find(t => t.Type != "operation"));
 
-                    return OptimiseTokens(tokenTree);
+                    OptimiseTokensNondestructive();
+                    break;
                 }
             }
-
-            return tokenTree;
         }
 
         private bool BranchResolvesToZero(Token parent)
@@ -228,8 +234,12 @@ namespace StringCalculator2
         {
             var tokenStack = new Stack<Token>();
 
+            var tokenId = 0;
+
             foreach (var token in input)
             {
+                token.TokenId = tokenId;
+                tokenId += 1;
                 switch (token.Type)
                 {
                     default:
