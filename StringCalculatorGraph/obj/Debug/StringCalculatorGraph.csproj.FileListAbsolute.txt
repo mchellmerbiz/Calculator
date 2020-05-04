@@ -1,0 +1,15 @@
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\bin\Debug\StringCalculatorGraph.exe.config
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\bin\Debug\StringCalculatorGraph.exe
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\bin\Debug\StringCalculatorGraph.pdb
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.csprojAssemblyReference.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\MainWindow.g.cs
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\App.g.cs
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph_MarkupCompile.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph_MarkupCompile.lref
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\MainWindow.baml
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.g.resources
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.Properties.Resources.resources
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.csproj.GenerateResource.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.csproj.CoreCompileInputs.cache
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.exe
+C:\Users\hemzlb\source\repos\StringCalculator2\StringCalculatorGraph\obj\Debug\StringCalculatorGraph.pdb
