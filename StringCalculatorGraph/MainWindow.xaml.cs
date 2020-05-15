@@ -17,40 +17,17 @@ using System.Windows.Shapes;
 
 namespace StringCalculatorGraph
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            var scvm = new StringCalculatorViewModel(calcGraph.Height, calcGraph.Width);
             void SetDataContext()
             {
-                var calcString = "x+1";
-                var calcStart = 0;
-                var calcEnd = 100;
-                var calcInterval = 10;
-
-                var vg = new GraphVariableGenerator();
-                var indVars = vg.GenerateIndependentVariables(calcStart, calcEnd, calcInterval);
-                var depVars = new List<double>();
-
-                //x + 1
-                foreach (var indVar in indVars)
-                {
-                    depVars.Add(indVar + 1);
-                }
-                var Points = new List<Point>();
-                for (int i = 0; i < indVars.Count; i++)
-                {
-                    var np = new Point() { X = indVars[i], Y = depVars[i] };
-                    Points.Add(np);
-                }
-
-                DataContext = new StringCalculatorViewModel
-                {
-                    Segments = new List<Segment>(Points.Zip(Points.Skip(1), (a, b) => new Segment { From = a, To = b }))
-                };
+                calcGraph.Children.Add(scvm.XaxisPath);
+                calcGraph.Children.Add(scvm.YaxisPath);
+                calcGraph.Children.Add(scvm.DatasetPoly);
             }
             SetDataContext();
             InitializeComponent();
