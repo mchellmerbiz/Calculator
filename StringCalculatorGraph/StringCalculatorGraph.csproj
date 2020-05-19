@@ -56,6 +56,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\GraphVariableGenerator.cs" />
+    <Compile Include="Models\StringParser.cs" />
+    <Compile Include="Models\Token.cs" />
+    <Compile Include="Models\TokenCalculator.cs" />
+    <Compile Include="Models\TokensOptimiserNondestructive.cs" />
+    <Compile Include="Models\TokensParser.cs" />
+    <Compile Include="Models\TokenVariableMap.cs" />
     <Compile Include="ViewModels\StringCalculatorViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -95,12 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\StringCalculator2\StringCalculator2.csproj">
-      <Project>{4b72a02a-319a-46a5-9287-ec13017d8f5d}</Project>
-      <Name>StringCalculator2</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

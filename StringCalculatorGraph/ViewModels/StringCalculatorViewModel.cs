@@ -13,36 +13,106 @@ namespace StringCalculatorGraph.ViewModels
 {
     public class StringCalculatorViewModel : INotifyPropertyChanged
     {
-        public Path XaxisPath;
-        public Path YaxisPath;
-        public Polyline DatasetPoly;
+        private string _expression;
+        public string Expression
+        {
+            get { return _expression; }
+            set
+            {
+                _expression = value;
+                OnPropertyChanged("Expression");
+            }
+        }
+
+        public double _expressionStart;
+        public double ExpressionStart
+        {
+            get { return _expressionStart; }
+            set
+            {
+                _expressionStart = value;
+                OnPropertyChanged("ExpressionStart");
+            }
+        }
+
+        public double _expressionEnd;
+        public double ExpressionEnd
+        {
+            get { return _expressionEnd; }
+            set
+            {
+                _expressionEnd = value;
+                OnPropertyChanged("ExpressionEnd");
+            }
+        }
+
+        private double _expressionInterval;
+        public double ExpressionInterval
+        {
+            get { return _expressionInterval; }
+            set
+            {
+                _expressionInterval = value;
+                OnPropertyChanged("ExpressionInterval");
+            }
+        }
+
+        private Path _xaxisPath;
+        public Path XaxisPath
+        {
+            get { return _xaxisPath; }
+            set
+            {
+                _xaxisPath = value;
+                OnPropertyChanged("XaxisPath");
+            }
+        }
+
+        private Path _yaxisPath;
+        public Path YaxisPath
+        {
+            get { return _yaxisPath; }
+            set
+            {
+                _yaxisPath = value;
+                OnPropertyChanged("YaxisPath");
+            }
+        }
+
+        private Polyline _datasetPoly;
+        public Polyline DatasetPoly
+        {
+            get { return _datasetPoly; }
+            set
+            {
+                _datasetPoly = value;
+                OnPropertyChanged("DatasetPoly");
+            }
+        }
+
         private Double Width;
         private Double Height;
         private Matrix WtoDMatrix, DtoWMatrix;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void UpdateData()
+        public void UpdateData()
         {
             // x graph values from user entry
-            var calcString = "x-3";
-            var calcStart = 0;
-            var calcEnd = 100;
-            var calcInterval = 10;
             var vg = new GraphVariableGenerator();
-            var indVars = vg.GenerateIndependentVariables(calcStart, calcEnd, calcInterval);
+            var indVars = vg.GenerateIndependentVariables(ExpressionStart, ExpressionEnd, ExpressionInterval);
 
             // y graph values calculated from x
             var depVars = new List<double>();
             foreach (var indVar in indVars)
             {
-                var eval = EvaluateFromString(calcString, string.Parse(indVar));
+                var eval = EvaluateFromString(Expression, indVar.ToString());
                 depVars.Add(eval);
             }
 
             // Setup graph sizes based on data
-            double wxmin = calcStart;
-            double wxmax = calcEnd;
+            double wxmin = ExpressionStart;
+            double wxmax = ExpressionEnd;
             double wymin = depVars.Min();
             double wymax = depVars.Max();
             double xstep = 1;
@@ -165,6 +235,10 @@ namespace StringCalculatorGraph.ViewModels
         {
             Height = graphHeight;
             Width = graphWidth;
+            Expression = "x^3";
+            ExpressionStart = -10;
+            ExpressionEnd = 10;
+            ExpressionInterval = 1;
             UpdateData();
         }
     }

@@ -2,6 +2,8 @@
 using StringCalculatorGraph.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,18 +21,49 @@ namespace StringCalculatorGraph
 {
     public partial class MainWindow : Window
     {
+        StringCalculatorViewModel Scvm;
+        private BackgroundWorker _bw = new BackgroundWorker();
+        private bool _evalCalled = false;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var scvm = new StringCalculatorViewModel(calcGraph.Height, calcGraph.Width);
+            Scvm = new StringCalculatorViewModel(calcGraph.Height, calcGraph.Width);
             void SetDataContext()
             {
-                calcGraph.Children.Add(scvm.XaxisPath);
-                calcGraph.Children.Add(scvm.YaxisPath);
-                calcGraph.Children.Add(scvm.DatasetPoly);
+                calcGraph.Children.Add(Scvm.XaxisPath);
+                calcGraph.Children.Add(Scvm.YaxisPath);
+                calcGraph.Children.Add(Scvm.DatasetPoly);
             }
             SetDataContext();
             InitializeComponent();
+            _bw = new BackgroundWorker();
+            _bw.DoWork += new DoWorkEventHandler(_bw_DoWork);
+            _bw.RunWorkerAsync();
+            this.DataContext = Scvm;
+        }
+
+        private void Window_Updated(object sender, RoutedEventArgs e)
+        {
+            _evalCalled = true;
+        }
+
+        void _bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                if (_evalCalled)
+                {
+                    Application.Current.Dispatcher.Invoke((Action)delegate {
+                        Scvm.UpdateData();
+                        calcGraph.Children.Clear();
+                        calcGraph.Children.Add(Scvm.XaxisPath);
+                        calcGraph.Children.Add(Scvm.YaxisPath);
+                        calcGraph.Children.Add(Scvm.DatasetPoly);
+                    });
+                    Console.WriteLine("Updating Canvas");
+                    _evalCalled = false;
+                }
+            }
         }
     }
 }

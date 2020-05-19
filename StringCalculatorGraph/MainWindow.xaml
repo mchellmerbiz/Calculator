@@ -10,7 +10,7 @@
         <TextBlock Text="Enter formula to graph."/>
         <TextBlock Text="Accepts real numbers, PEMDAS operations +-/*^(), and sin() cos() tan() functions."/>
         <TextBlock Text="A single letter in place of a real number will be treated as a variable."/>
-        <TextBox Text="1+x"/>
+        <TextBox Text="{Binding Expression, UpdateSourceTrigger=PropertyChanged}"/>
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="35" />
@@ -19,13 +19,15 @@
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="50" />
                 <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
             <TextBlock Padding="2" Text="Start:"/>
-            <TextBox Padding="2" Grid.Column="1" Text="-10"/>
+            <TextBox Padding="2" Grid.Column="1" Text="{Binding ExpressionStart, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Padding="2" Grid.Column="2" Text="End: "/>
-            <TextBox Padding="2" Grid.Column="3" Text="10"/>
-            <TextBlock Padding="2" Grid.Column="4" Text="Interval: "/>
-            <TextBox Padding="2" Grid.Column="5" Text="1"/>
+            <TextBox Padding="2" Grid.Column="3" Text="{Binding ExpressionEnd, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Padding="2" Grid.Column="4" Text="Interval"/>
+            <TextBox Padding="2" Grid.Column="5" Text="{Binding ExpressionInterval, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Column="6" Click="Window_Updated" Margin="5,0" Padding="5,0">Eval</Button>
         </Grid>
         <Grid Background="LightGreen">
             <Canvas Name="calcGraph" Background="White"
